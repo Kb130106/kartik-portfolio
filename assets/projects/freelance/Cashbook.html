@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>VFE - OFFICE CASHBOOK</title>
+    <style>
+        :root { --tally-blue: #0f2347; --ledger-cream: #f5f2e8; --gold: #e8a020; --success: #1e7d34; --danger: #a52a2a; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Georgia', serif; background: var(--tally-blue); margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        #app-container { display: none; flex-direction: column; height: 100%; width: 100%; max-width: 850px; margin: 0 auto; background: var(--ledger-cream); }
+        header { height: 50px; background: #0a1931; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; border-bottom: 2px solid var(--gold); flex-shrink: 0; }
+        main { flex: 1; padding: 12px; overflow-y: auto; }
+        .ganesh-header { text-align: center; color: var(--tally-blue); font-weight: bold; font-size: 18px; margin-bottom: 5px; }
+        .card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 15px; border-top: 4px solid var(--tally-blue); }
+        .dashboard-card { background: linear-gradient(135deg, #0a1931, #0f2347); color: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 5px solid var(--gold); }
+        .t-split { display: flex; gap: 10px; flex-wrap: wrap; }
+        .t-side { flex: 1; min-width: 320px; background: white; border: 1px solid #ccc; border-radius: 6px; }
+        .t-head { background: #eee; padding: 10px; font-weight: bold; text-align: center; border-bottom: 2px solid #ddd; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+        .input-field { padding: 12px; border: 1px solid #ccc; border-radius: 6px; margin: 5px 0; font-family: 'Georgia'; font-size: 16px; width: 100%; }
+        .btn { padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; min-height: 48px; margin-top: 10px; }
+        .btn-primary { background: var(--tally-blue); color: white; }
+        .bottom-nav { height: 70px; background: #0a1931; display: flex; border-top: 2px solid var(--gold); flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { color: rgba(255,255,255,0.5); background: none; border: none; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; }
+        .nav-item.active { color: var(--gold); font-weight: bold; }
+        .summary-bar { background: #0a1931; color: white; padding: 15px; display: flex; justify-content: space-around; font-weight: bold; font-size: 14px; border-top: 2px solid var(--gold); }
+    </style>
+</head>
+<body>
+    <div id="login-screen" style="position:fixed; inset:0; background:var(--tally-blue); display:flex; align-items:center; justify-content:center; z-index:1000; padding:20px;">
+        <div id="auth-box" style="background:white; padding:30px; border-radius:12px; text-align:center; width:100%; max-width:340px;">
+            <h2 style="color:var(--tally-blue); margin-bottom:20px;">VFE LOGIN</h2>
+            <div id="login-area">
+                <input type="password" id="pass-input" placeholder="Password" class="input-field" style="text-align:center; letter-spacing:8px;">
+                <button class="btn btn-primary" onclick="checkAuth()">LOGIN</button>
+                <button class="btn" style="background:none; color:var(--tally-blue); font-size:11px;" onclick="toggleForgot(true)">Forgot Password?</button>
+            </div>
+            <div id="forgot-area" style="display:none;">
+                <p style="font-size:12px; color:#666; margin-bottom:10px;">Verify Admin Phone:</p>
+                <input type="tel" id="phone-input" placeholder="Phone Number" class="input-field" style="text-align:center;">
+                <button class="btn btn-primary" style="background:var(--gold); color:var(--tally-blue)" onclick="resetPassword()">VERIFY & RESET</button>
+                <button class="btn" style="background:none; color:var(--danger); font-size:11px;" onclick="toggleForgot(false)">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-container">
+        <header>VFE - OFFICE CASHBOOK</header>
+        <main id="main-view"></main>
+        <div class="summary-bar" id="totals-bar"></div>
+        <nav class="bottom-nav">
+            <button class="nav-item active" onclick="showView('cashbook')">📔<br>Daily Page</button>
+            <button class="nav-item" onclick="showView('manage')">⚙️<br>Settings</button>
+        </nav>
+    </div>
+
+    <script>
+        const ADMIN_PHONE = "9876543210"; 
+        let db = JSON.parse(localStorage.getItem('VF_PRO_V86')) || { entries: [] };
+        let currentPass = localStorage.getItem('VF_PASS_KEY') || "1234";
+        let isAppVisible = false;
+
+        // FIXED ENTER BUTTON LOGIC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Enter") {
+                if (!isAppVisible) {
+                    checkAuth();
+                } else {
+                    const currentView = document.querySelector('.nav-item.active').innerText;
+                    if (currentView.includes('Daily')) {
+                        addEntry();
+                    }
+                }
+            }
+        });
+
+        function save() { localStorage.setItem('VF_PRO_V86', JSON.stringify(db)); }
+
+        function checkAuth() {
+            if (document.getElementById('pass-input').value === currentPass) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-container').style.display = 'flex';
+                isAppVisible = true;
+                showView('cashbook');
+            } else alert("Wrong Password");
+        }
+
+        function toggleForgot(show) {
+            document.getElementById('login-area').style.display = show ? 'none' : 'block';
+            document.getElementById('forgot-area').style.display = show ? 'block' : 'none';
+        }
+
+        function resetPassword() {
+            if (document.getElementById('phone-input').value === ADMIN_PHONE) {
+                const newPass = prompt("Identity Verified. New Password:");
+                if (newPass) { currentPass = newPass; localStorage.setItem('VF_PASS_KEY', newPass); alert("Updated!"); location.reload(); }
+            } else alert("Incorrect Phone!");
+        }
+
+        const gitaGyan = [
+            { day: 1, s: "धर्मक्षेत्रे कुरुक्षेत्रे समवेता युयुत्सवः ।", h: "Dharmakshetre kurukshetre samaveta yuyutsavah", m: "Kurukshetra mein yuddh ki ichha se ikathe hue mere aur Pandu ke putro ne kya kiya?" },
+            { day: 2, s: "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन ।", h: "Karmanye vadhikaraste ma phaleshu kadachana", m: "Sirf karma pe focus karo, phal ki chinta mat karo. Business mein effort daalo, result aayega." },
+            { day: 3, s: "न त्वेवाहं जातु नासं न त्वं नेमे जनाधिपाः ।", h: "Na tv evaham jatu nasam na tvam neme janadhipah", m: "Hum sab hamesha se thay aur hamesha rahenge, atma kabhi marti nahi." },
+            { day: 4, s: "वासांसि जीर्णानि यथा विहाय नवानि गृह्णाति...", h: "Vasansi jirnani yatha vihaya navani grhnati", m: "Jaise naye kapde badalte hain, vaise hi atma shareer badalti hai. Badlav se mat daro." },
+            { day: 5, s: "नैनं छिन्दन्ति शस्त्राणि नैनं दहति पावकः ।", h: "Nainam chhindanti shastrani nainam dahati pavakah", m: "Atma amar hai, use koi duniya ki taqat khatam nahi kar sakti." },
+            { day: 7, s: "सिद्ध्यसिद्ध्योः समो भूत्वा समत्वं योग उच्यते ॥", h: "Siddhy-asiddhyoh samo bhutva samatvam yoga uchyate", m: "Success aur failure dono mein balance rakho, yahi asli management hai." }
+        ];
+
+        function showView(v) {
+            const m = document.getElementById('main-view');
+            document.querySelectorAll('.nav-item').forEach((btn, i) => btn.classList.toggle('active', ['cashbook', 'manage'][i] === v));
+            if(v === 'cashbook') {
+                const d = localStorage.getItem('active_date') || new Date().toISOString().split('T')[0];
+                const dayNum = (Math.floor(Date.now() / 86400000) % gitaGyan.length);
+                const gyan = gitaGyan[dayNum];
+
+                m.innerHTML = `
+                    <div class="dashboard-card">
+                        <h3 style="margin:0; color:var(--gold)">Welcome back, Boss!</h3>
+                        <p style="font-size:11px; margin-top:5px; opacity:0.8;"><b>Today's Gyan (Day ${gyan.day}):</b></p>
+                        <p style="font-size:14px; margin:5px 0;"><i>"${gyan.s}"</i></p>
+                        <p style="font-size:12px; color:var(--ledger-cream)"><b>Meaning:</b> ${gyan.m}</p>
+                    </div>
+                    <div class="ganesh-header">श्री गणेशाय नमः</div>
+                    <div class="card">
+                        <input type="date" id="v-date" class="input-field" value="${d}" onchange="changeDate(this.value)">
+                        <input type="text" id="e-p" class="input-field" placeholder="Party Name / Particulars">
+                        <div style="display:flex; gap:10px;"><select id="e-s" class="input-field"><option value="left">Credit (Income)</option><option value="right">Debit (Expense)</option></select>
+                        <select id="e-m" class="input-field" onchange="toggleMode()"><option value="Cash">Cash</option><option value="GPay">GPay</option><option value="Bank">Bank</option><option value="Cheque">Cheque</option></select></div>
+                        <div id="bank-box" style="display:none"><input type="text" id="e-b" class="input-field" placeholder="Bank Details"></div>
+                        <input type="number" id="e-a" class="input-field" placeholder="Amount ₹">
+                        <button class="btn btn-primary" onclick="addEntry()">POST ENTRY (ENTER)</button>
+                    </div>
+                    <button class="btn" style="color:var(--danger); border:1px solid; background:none; font-size:12px; min-height:35px;" onclick="deleteDay()">🗑️ Delete All Entries for Today</button>
+                    <div class="t-split"><div class="t-side"><div class="t-head" style="color:var(--success)">CREDIT</div><table id="cr-table"><tbody></tbody></table></div>
+                    <div class="t-side"><div class="t-head" style="color:var(--danger)">DEBIT</div><table id="dr-table"><tbody></tbody></table></div></div>`;
+                render(d);
+            } else { m.innerHTML = `<div class="card"><h3>Manage Data</h3><button class="btn btn-primary" onclick="exportData()">📤 Backup</button><p>Import (Anti-Duplicate Sync):</p><input type="file" class="input-field" onchange="importData(this)"></div>`; document.getElementById('totals-bar').innerHTML = ''; }
+        }
+
+        function toggleMode() { document.getElementById('bank-box').style.display = (document.getElementById('e-m').value === 'Cash') ? 'none' : 'block'; }
+        function changeDate(v) { localStorage.setItem('active_date', v); showView('cashbook'); }
+        
+        function addEntry() {
+            const p = document.getElementById('e-p').value, a = parseFloat(document.getElementById('e-a').value);
+            if(!p || !a) return;
+            db.entries.push({ id: Date.now(), particular: p, amount: a, side: document.getElementById('e-s').value, mode: document.getElementById('e-m').value, bank: document.getElementById('e-b').value || '', date: document.getElementById('v-date').value });
+            save(); showView('cashbook');
+        }
+
+        function deleteEntry(id) { if(confirm("Delete this entry?")) { db.entries = db.entries.filter(x => x.id !== id); save(); showView('cashbook'); } }
+        
+        function deleteDay() {
+            const d = document.getElementById('v-date').value;
+            if(confirm("Delete ALL entries for this day?")) {
+                db.entries = db.entries.filter(x => x.date !== d);
+                save(); showView('cashbook');
+            }
+        }
+
+        function render(date) {
+            const day = db.entries.filter(e => e.date === date);
+            const crT = document.querySelector('#cr-table tbody'), drT = document.querySelector('#dr-table tbody');
+            let tCr = 0, tDr = 0;
+            crT.innerHTML = ''; drT.innerHTML = '';
+            day.forEach(e => {
+                const row = `<tr><td>${e.particular}<br><small>${e.mode}</small></td><td>₹${e.amount}</td><td><button onclick="deleteEntry(${e.id})" style="color:red;border:none;background:none;">✕</button></td></tr>`;
+                if(e.side === 'left') { crT.innerHTML += row; tCr += e.amount; } else { drT.innerHTML += row; tDr += e.amount; }
+            });
+            document.getElementById('totals-bar').innerHTML = `<span>Credit: ₹${tCr}</span><span>Debit: ₹${tDr}</span><span>Closing: ₹${tCr-tDr}</span>`;
+        }
+
+        function exportData() { const b = new Blob([JSON.stringify(db)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download='VFE_Backup.json'; a.click(); }
+        function importData(input) { 
+            const r = new FileReader(); 
+            r.onload = (e) => { 
+                const newData = JSON.parse(e.target.result); 
+                if (newData.entries) {
+                    const unique = newData.entries.filter(n => !db.entries.some(o => o.id === n.id));
+                    db.entries = [...db.entries, ...unique];
+                    save(); alert(`Merged ${unique.length} new entries!`); location.reload(); 
+                }
+            }; 
+            r.readAsText(input.files[0]); 
+        }
+    </script>
+</body>
+</html>

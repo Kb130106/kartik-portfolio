@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>VFE - PARTY LEDGER</title>
+    <style>
+        :root { --tally-blue: #0f2347; --ledger-cream: #f5f2e8; --gold: #e8a020; --success: #1e7d34; --danger: #a52a2a; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; background: #050a14; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; }
+        #app-container { display: none; flex-direction: column; width: 100%; max-width: 500px; height: 100%; background: var(--ledger-cream); position: relative; }
+        header { height: 55px; background: #0a1931; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; border-bottom: 2px solid var(--gold); flex-shrink: 0; }
+        main { flex: 1; padding: 15px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .dashboard-card { background: linear-gradient(135deg, #0a1931, #0f2347); color: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 5px solid var(--gold); }
+        .card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 15px; border-top: 4px solid var(--tally-blue); }
+        .input-field { padding: 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; width: 100%; margin-bottom: 10px; }
+        .btn { padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; width: 100%; min-height: 48px; margin-top: 5px; }
+        .btn-primary { background: var(--tally-blue); color: white; }
+        .bottom-nav { height: 75px; background: #0a1931; display: flex; border-top: 2px solid var(--gold); flex-shrink: 0; padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+        .nav-item { color: rgba(255,255,255,0.5); background: none; border: none; display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; font-size: 12px; }
+        .nav-item.active { color: var(--gold); font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px 5px; border-bottom: 1px solid #eee; text-align: left; font-size: 13px; }
+        .dr { color: var(--danger); font-weight: bold; }
+        .cr { color: var(--success); font-weight: bold; }
+
+        @media print {
+            .bottom-nav, .dashboard-card, .btn, .input-field, header, .nav-item { display: none !important; }
+            .card { border: 1px solid #000; box-shadow: none; margin: 0; width: 100%; }
+            body { background: white; }
+            #app-container { max-width: 100%; height: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen" style="position: fixed; inset: 0; background: var(--tally-blue); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;">
+        <div id="auth-box" style="background:white; padding:30px; border-radius:12px; text-align:center; width:100%; max-width:320px;">
+            <h2 style="color:var(--tally-blue); margin:0;">VFE LEDGER</h2>
+            <div id="login-form">
+                <input type="password" id="pin-input" placeholder="PIN" inputmode="numeric" class="input-field" style="text-align:center; font-size:24px; letter-spacing:10px;">
+                <button class="btn btn-primary" onclick="attemptLogin()">LOGIN</button>
+                <button class="btn" style="background:none; color:var(--tally-blue); font-size:11px;" onclick="toggleForgot(true)">Forgot PIN?</button>
+            </div>
+            <div id="forgot-form" style="display:none;">
+                <p style="font-size:12px; color:#666; margin-bottom:10px;">Enter Admin Phone:</p>
+                <input type="tel" id="phone-verify" placeholder="9876543210" class="input-field" style="text-align:center;">
+                <button class="btn btn-primary" onclick="verifyReset()">RESET PIN</button>
+                <button class="btn" style="background:none; color:var(--danger); font-size:11px;" onclick="toggleForgot(false)">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-container">
+        <header id="view-header">DASHBOARD</header>
+        <main id="main-view"></main>
+        <nav class="bottom-nav">
+            <button class="nav-item active" onclick="showView('dashboard')">🏠<br>Home</button>
+            <button class="nav-item" onclick="showView('debtors')">📉<br>Debtors</button>
+            <button class="nav-item" onclick="showView('creditors')">📈<br>Creditors</button>
+            <button class="nav-item" onclick="showView('manage')">⚙️<br>Manage</button>
+        </nav>
+    </div>
+
+    <script>
+        const ADMIN_PHONE = "9876543210"; 
+        let customers = JSON.parse(localStorage.getItem('VF_NORD_V10')) || [];
+        let activeId = null;
+        let appState = 'login';
+        let currentPin = localStorage.getItem('VF_PIN_KEY') || '1234';
+
+        const gitaGyan = [
+            { s: "योग: कर्मसु कौशलम्।", m: "Kaam ko perfection ke saath karna hi Yog hai. Business ki har bariki pe dhyan do." },
+            { s: "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।", m: "Mehnat pe focus karo Boss, result apne aap set ho jayega." }
+        ];
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                if (appState === 'login') attemptLogin();
+                else if (activeId && document.getElementById('t-amt')) postTx();
+            }
+        });
+
+        function save() { 
+            // Alphabetical Sort before saving
+            customers.sort((a, b) => a.name.localeCompare(b.name));
+            localStorage.setItem('VF_NORD_V10', JSON.stringify(customers)); 
+        }
+
+        function attemptLogin() {
+            if (document.getElementById('pin-input').value === currentPin) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-container').style.display = 'flex';
+                appState = 'app';
+                showView('dashboard');
+            } else alert("Wrong PIN");
+        }
+
+        function toggleForgot(show) {
+            document.getElementById('login-form').style.display = show ? 'none' : 'block';
+            document.getElementById('forgot-form').style.display = show ? 'block' : 'none';
+        }
+
+        function verifyReset() {
+            if (document.getElementById('phone-verify').value === ADMIN_PHONE) {
+                const n = prompt("Verified! Enter New PIN:");
+                if(n) { currentPin = n; localStorage.setItem('VF_PIN_KEY', n); location.reload(); }
+            } else alert("Incorrect Phone!");
+        }
+
+        function showView(v) {
+            const main = document.getElementById('main-view');
+            document.querySelectorAll('.nav-item').forEach((btn, i) => {
+                btn.classList.toggle('active', ['dashboard', 'debtors', 'creditors', 'manage'][i] === v);
+            });
+            
+            if (v === 'dashboard') {
+                let out = 0; customers.forEach(c => (c.transactions || []).forEach(t => out += (t.type === 'dr' ? t.amount : -t.amount)));
+                const gyan = gitaGyan[Math.floor(Math.random() * gitaGyan.length)];
+                main.innerHTML = `
+                    <div class="dashboard-card">
+                        <h3>Welcome back, Boss!</h3>
+                        <p style="font-size:11px; margin-top:5px; opacity:0.8;"><b>Today's Gyan:</b></p>
+                        <p style="font-size:14px; margin:5px 0;"><i>"${gyan.s}"</i></p>
+                        <p style="font-size:12px;"><b>Meaning:</b> ${gyan.m}</p>
+                    </div>
+                    <div class="card" style="background:#0a1931; color:white; text-align:center;">
+                        <small>TOTAL NET OUTSTANDING</small>
+                        <h1 style="color:var(--gold);">₹${out.toLocaleString('en-IN')}</h1>
+                    </div>`;
+            } else if (v === 'debtors' || v === 'creditors') renderList(main, v.slice(0,-1));
+            else if (v === 'manage') renderManage(main);
+            document.getElementById('view-header').innerText = v.toUpperCase();
+        }
+
+        function renderList(m, type) {
+            m.innerHTML = `<input type="text" class="input-field" placeholder="🔍 Search Party..." oninput="filterList('${type}', this.value)">
+                <div class="card"><input id="n-n" class="input-field" placeholder="Name"><input id="n-a" class="input-field" placeholder="Area"><button class="btn btn-primary" onclick="addP('${type}')">Add Party</button></div>
+                <div id="p-box"></div>`;
+            filterList(type, '');
+        }
+
+        function filterList(type, q) {
+            // Alphabetical list display
+            const list = customers.filter(c => c.group === type && c.name.toLowerCase().includes(q.toLowerCase()))
+                                  .sort((a,b) => a.name.localeCompare(b.name));
+            document.getElementById('p-box').innerHTML = list.map(c => `
+                <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                    <div onclick="openL('${c.id}')" style="flex:1; cursor:pointer;">
+                        <b>${c.name}</b><br><small>${c.area || '-'}</small>
+                    </div>
+                    <button onclick="delAcc('${c.id}')" style="background:none; border:none; color:red;">✕</button>
+                </div>`).join('');
+        }
+
+        function openL(id) { activeId = id; renderLedger(); }
+
+        function renderLedger() {
+            const p = customers.find(x => x.id === activeId);
+            let bal = 0;
+            const rows = (p.transactions || []).map((t, i) => {
+                bal += (t.type === 'dr' ? t.amount : -t.amount);
+                return `<tr><td>${t.date.split('-').reverse().join('/')}</td><td class="dr">${t.type==='dr'?t.amount:''}</td><td class="cr">${t.type==='cr'?t.amount:''}</td><td><button onclick="editTx(${i})" style="border:none;background:none;">✎</button></td></tr>`;
+            }).join('');
+            document.getElementById('main-view').innerHTML = `
+                <div class="card"><h3>${p.name}</h3><p>Area: ${p.area || 'N/A'}</p><h4>Balance: ₹${Math.abs(bal)} ${bal>=0?'Dr':'Cr'}</h4><button class="btn btn-primary" onclick="window.print()">🖨️ Print Statement</button></div>
+                <div class="card"><input type="date" id="t-d" class="input-field" value="${new Date().toISOString().split('T')[0]}"><div style="display:flex; gap:10px;"><select id="t-y" class="input-field"><option value="dr">Dr (+)</option><option value="cr">Cr (-)</option></select><input type="number" id="t-amt" class="input-field" placeholder="Amount"></div><button class="btn btn-primary" onclick="postTx()">Post Entry</button></div>
+                <div class="card" style="padding:0; overflow-x:auto;"><table><thead><tr><th>Date</th><th>Dr</th><th>Cr</th><th>✎</th></tr></thead><tbody>${rows}</tbody></table></div>
+                <button class="btn" style="margin-top:10px;" onclick="showView('${p.group}s')">← Back</button>`;
+        }
+
+        function postTx() {
+            const p = customers.find(x => x.id === activeId);
+            const a = parseFloat(document.getElementById('t-amt').value); if(!a) return;
+            p.transactions.push({ id: Date.now(), date: document.getElementById('t-d').value, type: document.getElementById('t-y').value, amount: a });
+            save(); renderLedger();
+        }
+
+        function editTx(i) {
+            const p = customers.find(x => x.id === activeId);
+            const v = prompt("Correct Amount:", p.transactions[i].amount);
+            if(v) { p.transactions[i].amount = parseFloat(v); save(); renderLedger(); }
+        }
+
+        function renderManage(m) {
+            m.innerHTML = `<div class="card"><h3>Database</h3><button class="btn btn-primary" onclick="exportData()">📤 Backup Export</button>
+                <button class="btn" style="background:none; border:1px solid red; color:red; margin-top:15px;" onclick="dangerReset()">🔥 CLEAR ALL DATA</button>
+                <hr><p style="font-size:12px;">Sync Cashbook / Import:</p><input type="file" class="input-field" onchange="importData(this)"></div>`;
+        }
+
+        function dangerReset() { if(confirm("DANGER: Delete EVERY account?")) { if(confirm("FINAL WARNING!")) { customers = []; save(); location.reload(); } } }
+        function delAcc(id) { if(confirm("Delete this account?")) { customers = customers.filter(c => c.id !== id); save(); showView('debtors'); } }
+
+        function addP(g) {
+            const n = document.getElementById('n-n').value; if(!n) return;
+            customers.push({ id: "C"+Date.now(), name: n, area: document.getElementById('n-a').value, group: g, transactions: [] });
+            save(); showView(g+'s');
+        }
+
+        function exportData() {
+            const b = new Blob([JSON.stringify(customers)], {type:'application/json'});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download='VF_Ledger_Backup.json'; a.click();
+        }
+
+        function importData(input) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    let imp = JSON.parse(e.target.result);
+                    let finalP = [];
+                    // UNIVERSAL SYNC Logic restored
+                    if (imp.entries) {
+                        imp.entries.forEach(entry => {
+                            let p = finalP.find(x => x.name === entry.particular) || customers.find(x => x.name === entry.particular);
+                            if (!p) { 
+                                p = { id: "C" + entry.id, name: entry.particular, area: "", group: (entry.side === 'right' ? "creditor" : "debtor"), transactions: [] }; 
+                                finalP.push(p); 
+                            }
+                            // Check unique transaction ID to prevent repetition
+                            if(!p.transactions.some(tx => tx.id === entry.id)) {
+                                p.transactions.push({ id: entry.id, date: entry.date, type: (entry.side === 'left' ? 'cr' : 'dr'), amount: entry.amount });
+                            }
+                        });
+                    } else if (Array.isArray(imp)) { finalP = imp; }
+                    
+                    customers = [...customers, ...finalP.filter(np => !customers.some(c => c.name === np.name))];
+                    save(); alert("Database Merged & Alphabetized Successfully!"); location.reload();
+                } catch(err) { alert("Invalid File."); }
+            };
+            reader.readAsText(input.files[0]);
+        }
+    </script>
+</body>
+</html>
