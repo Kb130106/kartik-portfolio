@@ -1,5 +1,5 @@
 /* ============================================================
-   style.css — Kartik Bhatia Portfolio
+   style.css — Kartik Bhatia Portfolio (Restored Edition)
    Theme 1 [data-theme="retro"]  → Retro Desktop (Win95 + Classic Mac)
    Theme 2 [data-theme="hacker"] → Hacker Dashboard (CRT / Matrix)
    ============================================================ */
@@ -11,7 +11,7 @@
 html { scroll-behavior: smooth; }
 img  { display: block; max-width: 100%; }
 
-/* ── THEME VARIABLES ────────────────────────────────────────── */
+/* ── THEME VARIABLES (RESTORED TO YOUR EXACT COLORS) ───────── */
 [data-theme="retro"] {
   --bg:            #9a8e80;
   --win-chrome:    #c0c0c0;
@@ -103,8 +103,8 @@ body {
 }
 
 /* Universal transition for theme crossfade */
-.window, .win-titlebar, .win-body, .skill-card, .project-card,
-.t-card, .edu-item, .cert-item, .social-link, .c-item,
+.window, .win-titlebar, .win-body, .skill-card, .project-card, .skill-box, .proj-card,
+.t-card, .edu-item, .cert-item, .social-link, .c-item, .tm-content, .tm-item,
 .retro-btn, #taskbar, .nav-tab, .section, .sec-title,
 #memoji-img, #memoji-img-next, .form-input, .status-dot {
   transition:
@@ -440,12 +440,10 @@ body {
 .tw-prompt  { color: #28c840; }
 .tw-comment { color: #4a6a4a; font-style: italic; }
 
-/* MAIN ROLE — neon glow */
 .tw-glow {
   color: #00ff41 !important;
   text-shadow: 0 0 6px #00ff41, 0 0 18px rgba(0,255,65,0.8), 0 0 36px rgba(0,255,65,0.4);
 }
-/* CYBERSEC — glitch flicker */
 .tw-glitch {
   color: #00d4ff !important;
   animation: glitch-flicker 3.5s ease-in-out infinite;
@@ -525,7 +523,7 @@ body {
 }
 [data-theme="hacker"] .nav-tab:hover { color: var(--accent); }
 
-/* ── SECTIONS ────────────────────────────────────────────────── */
+/* ── SECTIONS (WITH EMPTY STATE) ──────────────────────────────── */
 .section { display: none; padding: 20px 0; }
 .section.active { display: block; }
 
@@ -539,6 +537,12 @@ body {
   font-size: 11px; letter-spacing: 0.1em; text-shadow: var(--glow);
 }
 .sec-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--accent), transparent); }
+
+/* System Empty Placeholder */
+.section:empty::before, #skills-grid:empty::before, #projects-grid:empty::before {
+  content: "> [SYSTEM_ERROR]: Awaiting DB Connection...";
+  display: block; padding: 40px; text-align: center; font-family: var(--mono-font); opacity: 0.6; color: var(--accent);
+}
 
 /* ── ABOUT ───────────────────────────────────────────────────── */
 .about-grid {
@@ -570,22 +574,22 @@ body {
 [data-theme="hacker"] .info-row:hover { border-color: var(--accent); }
 .info-label { color: var(--accent); font-size: 10px; margin-right: 4px; }
 
-/* ── SKILLS GRID ─────────────────────────────────────────────── */
+/* ── SKILLS GRID (Restored and Mapped to JS) ─────────────────── */
 .skills-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 16px;
 }
 
-.skill-card { padding: 18px; border-radius: 4px; }
-[data-theme="retro"] .skill-card {
+.skill-card, .skill-box { padding: 18px; border-radius: 4px; }
+[data-theme="retro"] .skill-card, [data-theme="retro"] .skill-box {
   background: var(--win-chrome);
   border: 2px solid; border-color: var(--bdr-hi) var(--bdr-lo) var(--bdr-lo) var(--bdr-hi);
   box-shadow: 3px 3px 0 rgba(0,0,0,0.18);
 }
-[data-theme="hacker"] .skill-card {
+[data-theme="hacker"] .skill-card, [data-theme="hacker"] .skill-box {
   background: var(--win-face); border: 1px solid var(--border-dark); border-radius: 6px;
 }
-[data-theme="hacker"] .skill-card:hover { border-color: var(--accent); box-shadow: var(--card-glow); }
+[data-theme="hacker"] .skill-card:hover, [data-theme="hacker"] .skill-box:hover { border-color: var(--accent); box-shadow: var(--card-glow); }
 
 .skill-cat {
   font-family: var(--title-font); color: var(--accent); margin-bottom: 14px;
@@ -603,56 +607,56 @@ body {
   background: rgba(0,255,65,0.14); box-shadow: 0 0 8px rgba(0,255,65,0.3);
 }
 
-/* ── EXPERIENCE TIMELINE ─────────────────────────────────────── */
+/* ── EXPERIENCE TIMELINE (Restored and Mapped to JS) ─────────── */
 .timeline { position: relative; padding-left: 28px; }
 .timeline::before {
   content: ''; position: absolute; left: 7px; top: 0; bottom: 0; width: 2px;
   background: linear-gradient(180deg, var(--accent), transparent);
 }
 
-.t-item { position: relative; margin-bottom: 24px; }
-.t-dot {
+.t-item, .tm-item { position: relative; margin-bottom: 24px; }
+.t-dot, .tm-dot {
   position: absolute; left: -26px; top: 18px;
   width: 12px; height: 12px; border-radius: 50%; background: var(--accent);
 }
-[data-theme="retro"] .t-dot { border: 2px solid var(--bdr-hi); }
-[data-theme="hacker"] .t-dot { box-shadow: 0 0 10px rgba(0,255,65,0.7); }
+[data-theme="retro"] .t-dot, [data-theme="retro"] .tm-dot { border: 2px solid var(--bdr-hi); }
+[data-theme="hacker"] .t-dot, [data-theme="hacker"] .tm-dot { box-shadow: 0 0 10px rgba(0,255,65,0.7); }
 
-.t-card { padding: 16px; }
-[data-theme="retro"] .t-card {
+.t-card, .tm-content { padding: 16px; }
+[data-theme="retro"] .t-card, [data-theme="retro"] .tm-content {
   background: var(--win-chrome);
   border: 2px solid; border-color: var(--bdr-hi) var(--bdr-lo) var(--bdr-lo) var(--bdr-hi);
   box-shadow: 2px 2px 0 rgba(0,0,0,0.18);
 }
-[data-theme="hacker"] .t-card {
+[data-theme="hacker"] .t-card, [data-theme="hacker"] .tm-content {
   background: var(--win-face); border: 1px solid var(--border-dark); border-radius: 4px;
 }
-[data-theme="hacker"] .t-card:hover { border-color: var(--accent); box-shadow: var(--card-glow); }
+[data-theme="hacker"] .t-card:hover, [data-theme="hacker"] .tm-content:hover { border-color: var(--accent); box-shadow: var(--card-glow); }
 
-.t-company {
+.t-company, .tm-company {
   font-family: var(--title-font); color: var(--accent);
 }
-[data-theme="retro"] .t-company { font-size: 7px; }
-[data-theme="hacker"] .t-company { font-size: 10px; letter-spacing: 0.06em; text-shadow: var(--glow); }
+[data-theme="retro"] .t-company, [data-theme="retro"] .tm-company { font-size: 7px; }
+[data-theme="hacker"] .t-company, [data-theme="hacker"] .tm-company { font-size: 10px; letter-spacing: 0.06em; text-shadow: var(--glow); }
 
-.t-role {
+.t-role, .tm-role {
   font-family: var(--mono-font); font-size: 12px; margin-top: 3px;
 }
-[data-theme="retro"] .t-role  { color: var(--text-muted); }
-[data-theme="hacker"] .t-role { color: var(--accent2); }
+[data-theme="retro"] .t-role, [data-theme="retro"] .tm-role  { color: var(--text-muted); }
+[data-theme="hacker"] .t-role, [data-theme="hacker"] .tm-role { color: var(--accent2); }
 
-.t-date {
+.t-date, .tm-date {
   font-family: var(--mono-font); font-size: 10px; color: var(--text-dim);
   padding: 2px 7px; border-radius: 3px; border: 1px solid var(--border-dark);
   display: inline-block; margin-top: 6px; margin-bottom: 10px;
 }
-.t-bullets { padding-left: 0; list-style: none; }
-.t-bullets li {
+.t-bullets, .tm-bullets { padding-left: 0; list-style: none; }
+.t-bullets li, .tm-bullets li {
   font-family: var(--mono-font); font-size: 12px; line-height: 1.7;
   padding: 7px 10px; margin-bottom: 6px; border-left: 2px solid var(--accent);
 }
-[data-theme="retro"] .t-bullets li { background: var(--win-face); color: var(--text); }
-[data-theme="hacker"] .t-bullets li { background: rgba(0,255,65,0.03); color: var(--text-muted); }
+[data-theme="retro"] .t-bullets li, [data-theme="retro"] .tm-bullets li { background: var(--win-face); color: var(--text); }
+[data-theme="hacker"] .t-bullets li, [data-theme="hacker"] .tm-bullets li { background: rgba(0,255,65,0.03); color: var(--text-muted); }
 
 .t-impact {
   font-family: var(--mono-font); font-size: 11px;
@@ -664,68 +668,46 @@ body {
   background: rgba(0,255,65,0.06); border-left: 3px solid var(--accent); color: var(--accent);
 }
 
-/* ── PROJECTS GRID ───────────────────────────────────────────── */
+/* ── PROJECTS GRID (Restored and Mapped to JS) ───────────────── */
 .projects-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 18px;
 }
 
-.project-card { border-radius: 4px; overflow: hidden; }
-[data-theme="retro"] .project-card {
+.project-card, .proj-card { border-radius: 4px; overflow: hidden; padding: 16px; }
+[data-theme="retro"] .project-card, [data-theme="retro"] .proj-card {
   background: var(--win-chrome);
   border: 2px solid; border-color: var(--bdr-hi) var(--bdr-lo) var(--bdr-lo) var(--bdr-hi);
   box-shadow: 3px 3px 0 rgba(0,0,0,0.22);
   transition: transform 0.2s, box-shadow 0.2s;
 }
-[data-theme="retro"] .project-card:hover { transform: translateY(-3px); box-shadow: 5px 5px 0 rgba(0,0,0,0.3); }
-[data-theme="hacker"] .project-card {
+[data-theme="retro"] .project-card:hover, [data-theme="retro"] .proj-card:hover { transform: translateY(-3px); box-shadow: 5px 5px 0 rgba(0,0,0,0.3); }
+[data-theme="hacker"] .project-card, [data-theme="hacker"] .proj-card {
   background: var(--win-face); border: 1px solid var(--border-dark);
   transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
 }
-[data-theme="hacker"] .project-card:hover {
+[data-theme="hacker"] .project-card:hover, [data-theme="hacker"] .proj-card:hover {
   border-color: var(--accent); box-shadow: var(--card-glow); transform: translateY(-6px);
 }
 
-.pc-bar {
-  padding: 8px 12px; background: var(--win-title-bg); color: var(--win-title-fg);
-  display: flex; align-items: center; gap: 8px;
-}
-.pc-dots { display: flex; gap: 4px; }
-.pc-dot  { width: 10px; height: 10px; border-radius: 50%; }
-[data-theme="retro"] .pc-dot { background: var(--win-chrome); box-shadow: var(--raised); }
-[data-theme="hacker"] .pc-dot:nth-child(1){background:#ff5f57;} 
-[data-theme="hacker"] .pc-dot:nth-child(2){background:#febc2e;}
-[data-theme="hacker"] .pc-dot:nth-child(3){background:#28c840;}
-.pc-title {
+.pc-title, .proj-title {
   font-family: var(--title-font); flex: 1;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 8px;
 }
-[data-theme="retro"] .pc-title { font-size: 6.5px; }
-[data-theme="hacker"] .pc-title { font-size: 9px; }
+[data-theme="retro"] .pc-title, [data-theme="retro"] .proj-title { font-size: 8px; color: var(--accent); line-height: 1.5; }
+[data-theme="hacker"] .pc-title, [data-theme="hacker"] .proj-title { font-size: 11px; color: var(--accent); text-shadow: var(--glow); }
 
-.pc-body { padding: 14px; }
-.pc-desc {
+.pc-desc, .proj-desc {
   font-size: 12.5px; line-height: 1.75; margin-bottom: 12px;
 }
-[data-theme="retro"] .pc-desc { font-family: var(--body-font); color: var(--text); }
-[data-theme="hacker"] .pc-desc { font-family: var(--mono-font); color: var(--text-muted); }
-.pc-stack { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
-.pc-tech  {
-  font-family: var(--mono-font); font-size: 10px;
-  padding: 2px 8px; border-radius: 3px;
-  background: var(--tag-bg); border: 1px solid var(--tag-border); color: var(--text-dim);
-}
-.pc-links { display: flex; gap: 7px; flex-wrap: wrap; }
-.pc-link  {
-  font-family: var(--title-font); font-size: 7px; padding: 7px 12px;
-  border-radius: 3px; text-decoration: none; cursor: var(--cursor-ptr);
-}
-[data-theme="retro"] .pc-link { background: var(--win-chrome); color: var(--text); box-shadow: var(--raised); }
-[data-theme="retro"] .pc-link:active { box-shadow: var(--pressed); }
-[data-theme="hacker"] .pc-link {
-  background: transparent; color: var(--accent);
-  border: 1px solid var(--accent); letter-spacing: 0.04em;
-}
-[data-theme="hacker"] .pc-link:hover { background: var(--accent); color: #000; }
+[data-theme="retro"] .pc-desc, [data-theme="retro"] .proj-desc { font-family: var(--body-font); color: var(--text); }
+[data-theme="hacker"] .pc-desc, [data-theme="hacker"] .proj-desc { font-family: var(--mono-font); color: var(--text-muted); }
+
+.pc-stack, .proj-tech { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; font-family: var(--mono-font); font-size: 11px; }
+[data-theme="retro"] .proj-tech { color: var(--text-muted); font-weight: bold; }
+[data-theme="hacker"] .proj-tech { color: var(--accent2); }
+
+.pc-links, .proj-links { display: flex; gap: 7px; flex-wrap: wrap; }
+.retro-btn.small { font-size: 7px; padding: 6px 10px; }
 
 /* ── EDUCATION / CERTS ───────────────────────────────────────── */
 .edu-grid  { display: flex; flex-direction: column; gap: 12px; }
@@ -812,7 +794,7 @@ body {
 }
 textarea.form-input { min-height: 90px; resize: vertical; }
 
-/* ── ATS CV SECTION (embedded, no modal needed) ──────────────── */
+/* ── ATS CV SECTION ──────────────────────────────────────────── */
 .pdf-layout { display: grid; grid-template-columns: 280px 1fr; gap: 20px; align-items: start; }
 @media(max-width:680px) { .pdf-layout { grid-template-columns: 1fr; } }
 
@@ -824,8 +806,7 @@ textarea.form-input { min-height: 90px; resize: vertical; }
 [data-theme="hacker"] .pdf-label { letter-spacing: 0.06em; }
 .pdf-input {
   width: 100%; font-family: var(--mono-font); font-size: 12px;
-  padding: 8px 10px; outline: none; resize: vertical;
-  min-height: 38px;
+  padding: 8px 10px; outline: none; resize: vertical; min-height: 38px;
 }
 [data-theme="retro"] .pdf-input {
   background: var(--input-bg); color: var(--text);
@@ -839,35 +820,9 @@ textarea.form-input { min-height: 90px; resize: vertical; }
 
 .pdf-preview {
   background: #fff; color: #1a1a1a;
-  min-height: 400px; border: 1px solid #ccc; border-radius: 3px;
-  overflow: hidden;
+  min-height: 400px; border: 1px solid #ccc; border-radius: 3px; overflow: hidden;
 }
 
-/* CV DOCUMENT STYLES (inside white preview) */
-#cvdoc { padding: 32px; font-family: 'Share Tech Mono', monospace; font-size: 10.5px; line-height: 1.55; color: #1a1a1a; }
-.cv-hdr { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2.5px solid #1a1a4a; padding-bottom:10px; margin-bottom:12px; }
-.cv-n   { font-size:22px; font-weight:700; color:#1a1a4a; line-height:1.1; }
-.cv-r   { font-size:11px; color:#4a4a6a; margin-top:3px; }
-.cv-cnt { text-align:right; font-size:9.5px; color:#444; line-height:1.9; }
-.cv-2col{ display:grid; grid-template-columns:190px 1fr; gap:16px; }
-.cv-st  { font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:#1a1a4a; border-bottom:1.5px solid #1a1a4a; padding-bottom:2px; margin:12px 0 6px; }
-.cv-para{ font-size:10px; color:#333; line-height:1.6; margin-bottom:8px; }
-.cv-ei  { margin-bottom:7px; font-size:9.5px; }
-.cv-es  { font-weight:600; color:#1a1a4a; }
-.cv-ey  { color:#888; font-size:9px; }
-.cv-expi{ margin-bottom:11px; }
-.cv-er  { display:flex; justify-content:space-between; gap:8px; }
-.cv-ec  { font-weight:700; color:#1a1a4a; font-size:10px; }
-.cv-ed  { font-size:9px; color:#666; flex-shrink:0; }
-.cv-rl  { color:#4a4a6a; font-size:9.5px; margin-bottom:3px; }
-.cv-ul  { padding-left:12px; margin:0; }
-.cv-ul li{ margin-bottom:2px; color:#333; font-size:9px; line-height:1.5; }
-.cv-ci  { margin-bottom:4px; font-size:9.5px; padding-left:10px; position:relative; }
-.cv-ci::before{ content:'●'; position:absolute; left:0; color:#1a1a4a; font-size:6px; top:2px; }
-.cv-langs{ display:flex; gap:4px; flex-wrap:wrap; }
-.cv-langs span{ background:#f0f4ff; color:#1a1a4a; padding:2px 7px; border-radius:8px; font-size:9px; }
-
-/* ── CV MODAL ────────────────────────────────────────────────── */
 #cv-modal {
   display: none; position: fixed; inset: 0;
   background: rgba(0,0,0,0.88); z-index: 600;
@@ -894,9 +849,8 @@ textarea.form-input { min-height: 90px; resize: vertical; }
 .cv-mbtn.print-btn:hover { background: #00c832; }
 .cv-mbtn.close-btn { background: #ff5f57; color: #fff; }
 .cv-mbtn.close-btn:hover { background: #dd3330; }
-#cv-print { padding: 32px; font-family: Arial,'Segoe UI',sans-serif; font-size: 10.5px; line-height: 1.5; color: #1a1a1a; }
 
-/* Reuse CV classes for modal print too */
+#cv-print { padding: 32px; font-family: Arial,'Segoe UI',sans-serif; font-size: 10.5px; line-height: 1.5; color: #1a1a1a; }
 #cv-print .cv-hdr { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2.5px solid #1a1a4a; padding-bottom:10px; margin-bottom:12px; }
 #cv-print .cv-n   { font-size:22px; font-weight:700; color:#1a1a4a; }
 #cv-print .cv-r   { font-size:11px; color:#4a4a6a; margin-top:3px; }
@@ -910,13 +864,10 @@ textarea.form-input { min-height: 90px; resize: vertical; }
 #cv-print .cv-expi{ margin-bottom:11px; }
 #cv-print .cv-er  { display:flex; justify-content:space-between; gap:8px; }
 #cv-print .cv-ec  { font-weight:700; color:#1a1a4a; font-size:10px; }
-#cv-print .cv-ed  { font-size:9px; color:#666; }
-#cv-print .cv-rl  { color:#4a4a6a; font-size:9.5px; margin-bottom:3px; }
+#cv-print .cv-ed  { font-size:9px; color:#666; flex-shrink:0; }
 #cv-print .cv-ul  { padding-left:12px; margin:0; }
 #cv-print .cv-ul li{ margin-bottom:2px; color:#333; font-size:9px; }
-#cv-print .cv-ci  { margin-bottom:4px; font-size:9.5px; padding-left:10px; position:relative; }
-#cv-print .cv-ci::before{ content:'●'; position:absolute; left:0; color:#1a1a4a; font-size:6px; top:2px; }
-#cv-print .cv-langs span{ background:#f0f4ff; color:#1a1a4a; padding:2px 7px; border-radius:8px; font-size:9px; margin-right:3px; }
+#cv-print .cv-langs span{ background:#f0f4ff; color:#1a1a4a; padding:2px 7px; border-radius:8px; font-size:9px; margin-right:3px; display:inline-block;}
 
 /* ── FOOTER ──────────────────────────────────────────────────── */
 .win-footer {
@@ -937,11 +888,34 @@ textarea.form-input { min-height: 90px; resize: vertical; }
   .memoji-wrap { width: 120px; height: 120px; }
   .nav-tab { padding: 8px 11px; }
 }
-
-/* ── PRINT ───────────────────────────────────────────────────── */
+/* ── PRINT (PERFECT ATS PDF OUTPUT) ──────────────────────────── */
 @media print {
+  /* 1. Hide the main website body */
   body > *:not(#cv-modal) { display: none !important; }
-  #cv-modal { position: static; background: none; display: block !important; padding: 0; }
-  #cv-modal-inner { max-height: none; border-radius: 0; box-shadow: none; }
-  .cv-modal-bar { display: none; }
+  
+  /* 2. Reset the modal background and position for paper */
+  #cv-modal { 
+    position: absolute; top: 0; left: 0; 
+    background: none; display: block !important; 
+    padding: 0; margin: 0; width: 100%; 
+  }
+  
+  #cv-modal-inner { 
+    max-height: none; border-radius: 0; box-shadow: none; 
+    width: 100%; max-width: none; margin: 0; padding: 0; background: #fff;
+  }
+  
+  /* 3. Hide ALL input forms, toolbars, and buttons inside the modal */
+  #cv-modal-inner > div:not(#cv-print) { display: none !important; }
+  .cv-modal-bar { display: none !important; }
+  
+  /* 4. Ensure ONLY the actual CV prints cleanly */
+  #cv-print { 
+    display: block !important; 
+    padding: 0 !important; /* Removes extra padding so it fits the page */
+    margin: 0;
+  }
+  
+  /* 5. Force the browser to hide URLs and Dates at the top/bottom */
+  @page { margin: 0.5cm; }
 }
