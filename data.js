@@ -17,10 +17,22 @@ const portfolioData = {
     location: "Surat, Gujarat"
   },
   skills: [
-    { category: "Backend & Database", items: ["ASP.NET MVC", "C#", "SQL Server", "ADO.NET", "Entity Framework", "Web Forms"] },
-    { category: "Security & DSA", items: ["Data Structures", "Sorting Algorithms", "SHA-256 Hashing", "Identity Auth", "Binary Search"] },
-    { category: "Frontend & UI", items: ["HTML5", "CSS3", "JavaScript (ES6+)", "Responsive Design", "Retro UI Engineering"] },
-    { category: "Tools & Professional", items: ["Visual Studio", "GitHub", "Digital Marketing", "Meta Ads", "Event Management"] }
+    { 
+      category: "Backend & Database", 
+      items: ["ASP.NET MVC", "C#", "SQL Server", "ADO.NET", "Entity Framework", "Web Forms", "Oracle DBMS", "Java"] 
+    },
+    { 
+      category: "Security & DSA", 
+      items: ["Data Structures", "Sorting Algorithms", "SHA-256 Hashing", "Identity Auth", "Binary Search"] 
+    },
+    { 
+      category: "Frontend & UI", 
+      items: ["HTML5", "CSS3", "JavaScript (ES6+)", "Responsive Design", "Retro UI Engineering", "Bootstrap", "WordPress (Basic)", "Figma", "CSS"] 
+    },
+    { 
+      category: "Tools, Professional & Soft Skills", 
+      items: ["Visual Studio", "GitHub", "Digital Marketing", "Meta Ads", "Event Management", "Project Management", "Team Management", "Team Leadership", "Communication", "NSS"] 
+    }
   ],
   experience: [
     {
@@ -46,15 +58,15 @@ const portfolioData = {
       impact: "Scaled organic reach to over 100,000 views within the first 30 days."
     },
     {
-      company: "OPERATION ZERO BRIBE (ACB & Govt of Gujarat)",
-      role: "Core Member",
-      date: "2024 – 2025",
+      company: "OPERATION ZERO BRIBE (Public Initiative with Govt of Gujarat)",
+      role: "Core Member (Season 1)",
+      date: "Dec 2025 – Mar 2026",
       bullets: [
-        "Organized government-backed public awareness campaigns at V.T. Choksi Sarvajanik Law College.",
-        "Managed communication between college administration and anti-corruption bureau officials.",
-        "Authored and submitted official impact reports to government representatives."
+        "Orchestrated large-scale civic transparency campaigns across prominent venues (including V.T. Choksi Law College, VR Mall, and Surat Fort) in collaboration with government officials.",
+        "Educated the public on systemic integrity, compliance frameworks, and social engineering risks, effectively bridging government directives with actionable security awareness.",
+        "Directed digital outreach and authored official impact reports, scaling the initiative to achieve feature coverage across 32+ publications, including major dailies like Gujarat Samachar, Divya Bhaskar, and The Times of India."
       ],
-      impact: "Successfully managed a ₹50,000 budget and educated 1,000+ citizens."
+      impact: "Successfully managed a ₹50,000 budget with the group, directly educated over 5,000+ citizens, and massive city-wide awareness."
     }
   ],
   projects: [
@@ -86,12 +98,12 @@ const portfolioData = {
   education: [
     { title: "B.Sc. Information Technology", institution: "SRKI — Sarvajanik University", date: "2024 – Current" },
     { title: "11th–12th Commerce",            institution: "S.D. Jain Modern School",     date: "2022 – 2024" },
-     { title: "Nursery–10th",            institution: "Delhi Public School",     date: "2010 – 2021" }
+    { title: "Nursery–10th",                  institution: "Delhi Public School",         date: "2010 – 2021" }
   ],
   certifications: [
-    { title: "Claude 101 AI Certification",  issuer: "Anthropic Academy", score: "90%", badge: "📑" },
-    { title: "Gen AI 101 Specialist",       issuer: "NASSCOM",           score: "A",    badge: "📑" },
-    { title: "Digital Marketing Certified", issuer: "Erasmus+ (EU)",     score: "Pass", badge: "🏆" },
+    { title: "Claude 101 AI Certification",  issuer: "Anthropic Academy", score: "90%", badge: "🤖" },
+    { title: "Gen AI 101 Specialist",       issuer: "NASSCOM",           score: "A",    badge: "🧠" },
+    { title: "Digital Marketing Certified", issuer: "Erasmus+ (EU)",     score: "Pass", badge: "📊" },
     { title: "NDA WIZQUIZ-23 Winner",       issuer: "All India Comp.",   score: "9th",  badge: "🏆" }
   ],
   socials: {
