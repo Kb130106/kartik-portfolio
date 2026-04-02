@@ -6,7 +6,7 @@
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://formspree.io; form-action 'self' https://formspree.io; frame-ancestors 'none'; base-uri 'self'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: *; connect-src 'self' https://formspree.io; form-action 'self' https://formspree.io; frame-ancestors 'none'; base-uri 'self'; object-src 'none';">
 <meta name="description" content="Kartik Bhatia — Full-Stack Developer & Cybersecurity Follower. B.Sc. IT, SRKI Surat.">
 <meta name="author" content="Kartik Bhatia">
 <title>Kartik Bhatia // Portfolio</title>
@@ -101,8 +101,8 @@
           <div class="hero-btns">
             <a class="retro-btn primary" id="resume-link" href="assets/kartik_bhatia_cv.pdf" download rel="noopener noreferrer">📄 Download CV</a>
             <button class="retro-btn" onclick="openCVModal()">✨ Generate ATS CV</button>
-            <a class="retro-btn" id="social-linkedin" href="https://www.linkedin.com/in/yourprofile" target="_blank" rel="noopener noreferrer">🔗 LinkedIn</a>
-            <a class="retro-btn" id="social-github" href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer">🐙 GitHub</a>
+            <a class="retro-btn" id="social-linkedin" href="https://www.linkedin.com/in/kartikbhatia1301" target="_blank" rel="noopener noreferrer">🔗 LinkedIn</a>
+            <a class="retro-btn" id="social-github" href="https://github.com/Kb130106" target="_blank" rel="noopener noreferrer">🐙 GitHub</a>
           </div>
         </div>
 
@@ -141,7 +141,8 @@
         <div class="sec-hdr"><span class="sec-ico">👤</span><span class="sec-title">About Me</span><div class="sec-line"></div></div>
         <div class="about-grid">
           <div class="about-block">
-            <div style="font-family:var(--mono-font);font-size:10px;color:var(--accent);margin-bottom:8px;letter-spacing:0.08em;">// BIO.TXT</div>
+            <div style="font-family:var(--mono-font);font-size:10px;color:var(--accent);margin-bottom:8px;letter-spacing:0.08em;">// BIO.About Me</div>
+            <img id="about-img" src="assets/about.jpg.png" alt="Kartik Bhatia" style="width:50%; border: 1px solid var(--bdr-lo); margin-bottom: 12px; border-radius: 2px;">
             <p id="about-bio" style="font-size:13px;line-height:1.9;"></p>
           </div>
           <div class="about-block">
@@ -182,11 +183,13 @@
           <div id="contact-info-list"></div>
           <div class="contact-form">
             <div class="form-title">// SEND MESSAGE</div>
-            <input  class="form-input" id="cf-name"  type="text"  placeholder="Your Name" maxlength="80">
-            <input  class="form-input" id="cf-email" type="email" placeholder="Your Email" maxlength="100">
-            <input  class="form-input" id="cf-phone" type="tel"   placeholder="Phone (opt.)" maxlength="20">
-            <textarea class="form-input" id="cf-msg" placeholder="Your Message..." maxlength="1000" rows="4"></textarea>
-            <button class="retro-btn primary" style="width:100%;justify-content:center;padding:11px;" onclick="sendMessage()">▶ TRANSMIT MESSAGE</button>
+            <form action="https://formspree.io/f/mqaeveqe" method="POST">
+                <input class="form-input" name="name" type="text" placeholder="Your Name" maxlength="80" required>
+                <input class="form-input" name="email" type="email" placeholder="Your Email" maxlength="100" required>
+                <input class="form-input" name="phone" type="tel" placeholder="Phone (opt.)" maxlength="20">
+                <textarea class="form-input" name="message" placeholder="Your Message..." maxlength="1000" rows="4" required></textarea>
+                <button class="retro-btn primary" style="width:100%;justify-content:center;padding:11px;" type="submit">▶ TRANSMIT MESSAGE</button>
+            </form>
             <div id="cf-status" role="status" aria-live="polite" style="font-family:'Share Tech Mono',monospace;font-size:11px;min-height:18px;margin-top:4px;"></div>
           </div>
         </div>
@@ -202,7 +205,7 @@
 
     <div class="win-footer">
       <span>© 2026 <span id="footer-name">Kartik Bhatia</span> · Vanilla JS · Zero Backend</span>
-      <span><span class="status-dot" aria-hidden="true"></span> All systems operational</span>
+      <span><span class="status-dot" aria-hidden="true"></span> All systems operational</span>-
     </div>
   </div>
 
