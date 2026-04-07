@@ -7,7 +7,7 @@ const portfolioData = {
     name: "Kartik Bhatia",
     role: "Full-Stack .NET Developer & Cybersecurity Follower",
     tagline: "Engineering secure, database-driven architectures and offline-first business solutions.",
-    resumeLink: "assets/kartik_bhatia_cv.pdf"
+    resumeLink: "assets/Kartik Bhatia __ Portfolio (1).pdf"
   },
   about: {
     image: "assets/about.jpg.png", 
